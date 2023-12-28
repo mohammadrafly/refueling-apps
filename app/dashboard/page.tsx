@@ -1,16 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const Page = () => {
   const router = useRouter();
-  const [Username] = useState(localStorage.getItem("username"));
+  const [Username, setUsername] = useState("");
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedUsername = localStorage.getItem("username")
+
+      if (storedUsername) {
+        setUsername(storedUsername);
+      }
+    }
+  }, []);
 
   const logoutAndFlushStorage = (e: { preventDefault: () => void; }) => {
     e.preventDefault();
-    localStorage.setItem("username", "");
-    localStorage.setItem("password", "");
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem("username", "");
+      localStorage.setItem("password", "");
+    }
     router.push('/', { scroll: false });
   }
 
