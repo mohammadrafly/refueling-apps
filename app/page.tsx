@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/navigation';
@@ -11,12 +11,28 @@ const Page = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [Username, setUsername] = useState("Username");
   const [Password, setPassword] = useState("Password");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const saveMeToLocalStorage = (e: { preventDefault: () => void; }) => {
-    e.preventDefault();
-    localStorage.setItem("username", Username);
-    localStorage.setItem("password", Password);
-    router.push('/dashboard', { scroll: false });
+  const saveMeToLocalStorage = async (e: { preventDefault: () => void; }) => {
+    try {
+      e.preventDefault();
+      setIsLoading(true);
+  
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          localStorage.setItem("username", Username);
+          localStorage.setItem("password", Password);
+  
+          setIsLoading(false);
+          router.push('/dashboard', { scroll: false });
+  
+          resolve();
+        }, 5000);
+      });
+    } catch (error) {
+      console.error("Error during login:", error);
+      setIsLoading(false);
+    }
   }
 
   const togglePasswordVisibility = () => {
@@ -81,10 +97,13 @@ const Page = () => {
             </div>
           </div>
           <input
-            type="submit"
-            value="Login"
             onClick={() => router.push('/dashboard')}
-            className="mt-5 p-3 bg-blue-400 hover:bg-blue-500 text-white rounded-lg w-full flex items-center justify-center"
+            type="submit"
+            value={isLoading ? "Logging in..." : "Login"}
+            disabled={isLoading}
+            className={`mt-5 p-3 ${
+              isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-400 hover:bg-blue-500"
+            } text-white rounded-lg w-full flex items-center justify-center`}
           />
         </form>
       </div>
