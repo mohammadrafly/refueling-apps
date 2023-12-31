@@ -53,7 +53,7 @@ const Page = () => {
 
   return (
     <main className="flex items-center justify-center bg-gray-200">
-      <div className="text-black w-[450px] min-h-screen bg-white items-center justify-center p-4">
+      <div className="text-black w-[500px] min-h-screen bg-white items-center justify-center p-4">
         {isLoading ? (
           <div role="status" className="max-w-sm animate-pulse p-4 flex">
             <div>
@@ -74,7 +74,7 @@ const Page = () => {
               <Card />
               <div>
                 {showLogoutAlert && (
-                  <div className="bg-green-200 text-green-800 p-2 mb-4">
+                  <div className="bg-green-200 text-green-800 p-2 mb-4 rounded-lg">
                     You have been successfully logged out! Redirecting in {countdown} seconds.
                   </div>
                 )}

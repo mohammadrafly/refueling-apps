@@ -49,7 +49,7 @@ const Page = () => {
 
   return (
     <main className="flex items-center justify-center bg-gray-200">
-      <div className="text-black w-[450px] min-h-screen bg-white flex items-center justify-center">
+      <div className="text-black w-[500px] min-h-screen bg-white flex items-center justify-center">
         <div className="w-full p-4">
           <div className="mt-4 md:mt-[50px] mb-4 md:mb-[50px] mx-auto font-semibold text-2xl flex items-center justify-center">
             <span className="mr-2 text-2xl font-extrabold">Refueling Apps</span>
