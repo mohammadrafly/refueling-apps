@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({ username }) => {
     const initials = getInitials(username);
 
     return (
-        <div className="p-4 flex items-center text-gray-500">
+        <div className="flex items-center text-gray-500 mb-[25px]">
             <Link href="/profile">
                 <Image
                     src={`data:image/svg+xml,${encodeURIComponent(
@@ -30,8 +30,8 @@ const Header: React.FC<HeaderProps> = ({ username }) => {
                 />
             </Link>
             <div className="ml-3">
-                <p className="text-2xl text-black font-bold">{username}</p>
-                <p className="text-sm font-semibold">Employee</p>
+                <p className="text-2xl text-black font-semibold">{username}</p>
+                <p className="text-sm bold">Employee</p>
             </div>
         </div>
     );

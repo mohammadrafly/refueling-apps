@@ -28,7 +28,7 @@ const Footer: React.FC<FooterProps> = ({ onLogout }) => {
 
   return (
     <button
-      className="rounded-lg bg-red-400 text-white w-full h-8"
+      className="rounded-lg bg-red-400 text-white w-full h-8 mb-[100px]"
       onClick={logoutAndFlushStorage}
     >
       Logout

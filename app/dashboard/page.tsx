@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Menu from '../components/Menu';
+import Card from '../components/Card';
 
 const Page = () => {
   const router = useRouter();
@@ -64,18 +66,25 @@ const Page = () => {
           </div>
         ) : (
           <>
-            <Header username={username}></Header>
-            <div className="flex items-center justify-center min-h-screen">
+            {!showLogoutAlert && 
+              <>
+                <Header username={username} />
+              </>
+            }
+              <Card />
               <div>
                 {showLogoutAlert && (
                   <div className="bg-green-200 text-green-800 p-2 mb-4">
                     You have been successfully logged out! Redirecting in {countdown} seconds.
                   </div>
                 )}
-                {!showLogoutAlert && <span>Hello, {username}</span>}
               </div>
-            </div>
-            <Footer onLogout={handleLogout} />
+            {!showLogoutAlert && 
+              <>
+                <Footer onLogout={handleLogout} />
+                <Menu />
+              </>
+            }
           </>
         )}
       </div>
