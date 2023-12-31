@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Menu from '../components/Menu';
 import Card from '../components/Card';
+import LastRefuel from '../components/LastRefuel';
 
 const Page = () => {
   const router = useRouter();
@@ -25,7 +26,7 @@ const Page = () => {
           router.push('/', { scroll: false });
         }
         setIsLoading(false);
-      }, 3000);
+      }, 1000);
     }
   }, [router]);
 
@@ -54,39 +55,26 @@ const Page = () => {
   return (
     <main className="flex items-center justify-center bg-gray-200">
       <div className="text-black w-[500px] min-h-screen bg-white items-center justify-center p-4">
-        {isLoading ? (
-          <div role="status" className="max-w-sm animate-pulse p-4 flex">
-            <div>
-              <div className="bg-gray-400 rounded-full w-[50px] h-[50px] mb-4"></div>
-            </div>
-            <div className="ml-3">
-              <div className="h-5 bg-gray-400 rounded-full w-32 mb-4"></div>
-              <div className="h-2.5 bg-gray-400 rounded-full w-16 mb-4"></div>
-            </div>
-          </div>
-        ) : (
+        {!showLogoutAlert && 
           <>
-            {!showLogoutAlert && 
-              <>
-                <Header username={username} />
-              </>
-            }
-              <Card />
-              <div>
-                {showLogoutAlert && (
-                  <div className="bg-green-200 text-green-800 p-2 mb-4 rounded-lg">
-                    You have been successfully logged out! Redirecting in {countdown} seconds.
-                  </div>
-                )}
+            <Header username={username} />
+          </>
+        }
+          <Card />
+          <LastRefuel />
+          <div>
+            {showLogoutAlert && (
+              <div className="bg-green-200 text-green-800 p-2 mb-4 rounded-lg">
+                You have been successfully logged out! Redirecting in {countdown} seconds.
               </div>
+            )}
+          </div>
             {!showLogoutAlert && 
               <>
                 <Footer onLogout={handleLogout} />
                 <Menu />
               </>
             }
-          </>
-        )}
       </div>
     </main>
   );
