@@ -56,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ username }) => {
                         {username}
                     </p>
                     <p className="text-sm font-semibold">
-                        Refueler
+                        Fuelman
                     </p>
                 </div>
             )}

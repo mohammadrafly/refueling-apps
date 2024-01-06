@@ -60,7 +60,6 @@ const Page = () => {
             <Header username={username} />
           </>
         }
-          <Card />
           <LastRefuel />
           <div>
             {showLogoutAlert && (

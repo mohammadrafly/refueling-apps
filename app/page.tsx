@@ -50,14 +50,14 @@ const Page = () => {
   return (
     <main className="flex items-center justify-center bg-gray-200">
       <div className="text-black w-[500px] min-h-screen bg-white flex items-center justify-center">
-        <div className="w-full p-4">
-          <div className="mt-4 md:mt-[50px] mb-4 md:mb-[50px] mx-auto font-semibold text-2xl flex items-center justify-center">
-            <span className="mr-2 text-2xl font-extrabold">Refueling Apps</span>
+        <div className="w-full p-6">
+          <div className="mt-4 md:mt-[50px] mb-4 md:mb-[50px] mx-auto font-semibold text-2xl flex items-left">
+            <span className="text-6xl font-extrabold">Welcome Back</span>
           </div>
-          <div className="flex items-center justify-center mb-4 md:mb-[50px]">
-            Gunakan akun refueling apps anda
+          <div className="flex items-left mb-4 text-lg font-semibold md:mb-[50px]">
+            Sign in to continue.
           </div>
-          <form className="p-2" onSubmit={saveMeToLocalStorage}>
+          <form onSubmit={saveMeToLocalStorage}>
             <div className="mb-5">
               <label className="text-sm">Username</label>
               <div className="mt-2">
