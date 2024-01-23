@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Menu from '../components/Menu';
-import Card from '../components/Card';
 import LastRefuel from '../components/LastRefuel';
 
 const Page = () => {
