@@ -1,19 +1,32 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
 
 const CameraPage = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraError, setIsCameraError] = useState(false);
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const startCamera = async () => {
       try {
-        const cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const cameras = await navigator.mediaDevices.enumerateDevices();
+        const backCamera = cameras.find((device) => device.kind === 'videoinput');
+
+        const cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: backCamera?.deviceId || undefined,
+          },
+        });
+
         setStream(cameraStream);
+
+        if (videoRef.current) {
+          videoRef.current.srcObject = cameraStream;
+        }
       } catch (error) {
         console.error('Error accessing camera:', error);
         setIsCameraError(true);
