@@ -12,50 +12,31 @@ const CameraPage = () => {
 
   useEffect(() => {
     const startCamera = async () => {
-       try {
-         // Request permission for video devices
-         const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
-         const devices = await navigator.mediaDevices.enumerateDevices();
-         let backCameraId;
-   
-         // Find the device ID of the back camera
-         devices.forEach(device => {
-           if (device.kind === 'videoinput' && device.label.toLowerCase().includes('back')) {
-             backCameraId = device.deviceId;
-           }
-         });
-   
-         // Stop the temporary stream
-         tempStream.getTracks().forEach(track => track.stop());
-   
-         // Use the device ID to request the back camera stream
-         const constraints = {
-           video: {
-             deviceId: { exact: backCameraId }
-           }
-         };
-         const cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-   
-         setStream(cameraStream);
-   
-         if (videoRef.current) {
-           videoRef.current.srcObject = cameraStream;
-         }
-       } catch (error) {
-         console.error('Error accessing camera:', error);
-         setIsCameraError(true);
-       }
-    };
-   
+      try {
+        const cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+    
+        setStream(cameraStream);
+    
+        if (videoRef.current) {
+          videoRef.current.srcObject = cameraStream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setIsCameraError(true);
+      }
+    };    
+
     startCamera();
-   
+
     return () => {
-       if (stream) {
-         const tracks = stream.getTracks();
-         tracks.forEach(track => track.stop());
-       }
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach((track) => track.stop());
+      }
     };
-   }, []);
+  }, [stream]);
 
   const handleBackButtonClick = () => {
     router.push('/dashboard');
@@ -71,7 +52,7 @@ const CameraPage = () => {
             ) : (
               <Webcam
                 audio={false}
-                mirrored={false}
+                mirrored={true}
                 style={{ width: '100%' }}
               />
             )}
