@@ -12,36 +12,33 @@ const CameraPage = () => {
 
   useEffect(() => {
     const startCamera = async () => {
-      try {
-        const cameras = await navigator.mediaDevices.enumerateDevices();
-        const backCamera = cameras.find((device) => device.kind === 'videoinput');
-
-        const cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: backCamera?.deviceId || undefined,
-          },
-        });
-
-        setStream(cameraStream);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = cameraStream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setIsCameraError(true);
-      }
+       try {
+         const cameraStream = await navigator.mediaDevices.getUserMedia({
+           video: {
+             facingMode: { exact: 'environment' },
+           },
+         });
+   
+         setStream(cameraStream);
+   
+         if (videoRef.current) {
+           videoRef.current.srcObject = cameraStream;
+         }
+       } catch (error) {
+         console.error('Error accessing camera:', error);
+         setIsCameraError(true);
+       }
     };
-
+   
     startCamera();
-
+   
     return () => {
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach((track) => track.stop());
-      }
+       if (stream) {
+         const tracks = stream.getTracks();
+         tracks.forEach((track) => track.stop());
+       }
     };
-  }, [stream]);
+   }, [stream]);
 
   const handleBackButtonClick = () => {
     router.push('/dashboard');
@@ -57,7 +54,7 @@ const CameraPage = () => {
             ) : (
               <Webcam
                 audio={false}
-                mirrored={true}
+                mirrored={false}
                 style={{ width: '100%' }}
               />
             )}
