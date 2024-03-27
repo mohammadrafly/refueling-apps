@@ -64,7 +64,6 @@ const CameraPage = () => {
                 audio={false}
                 mirrored={facingMode === 'user'}
                 style={{ width: '100%' }}
-                ref={videoRef}
               />
             )}
             <div className="flex justify-between mt-4">
