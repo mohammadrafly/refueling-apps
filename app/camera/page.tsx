@@ -1,81 +1,55 @@
 'use client';
+import React, { useRef, useState, useEffect } from 'react';
+import Webcam from 'webcamjs';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import Webcam from 'react-webcam';
-
-const CameraPage = () => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
+const CameraComponent = () => {
+  const videoRef = useRef(null);
   const [isCameraError, setIsCameraError] = useState(false);
-  const router = useRouter();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
-    const startCamera = async () => {
-      try {
-        const cameras = await navigator.mediaDevices.enumerateDevices();
-        const backCamera = cameras.find(device => device.kind === 'videoinput' && device.label.includes('back'));
+    Webcam.set({
+      width: 320,
+      height: 240,
+      image_format: 'jpeg',
+      jpeg_quality: 90,
+      force_flash: false,
+      flip_horiz: true,
+      fps: 45
+    });
 
-        if (!backCamera) {
-          throw new Error('No back camera found');
-        }
-
-        const cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: backCamera.deviceId,
-          },
-        });
-
-        setStream(cameraStream);
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = cameraStream;
-        }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
+    Webcam.attach(videoRef.current, function(err) {
+      if (err) {
+        console.error('Error attaching webcam:', err);
         setIsCameraError(true);
+      } else {
+        console.log('Webcam attached successfully');
       }
-    };
-
-    startCamera();
+    });
 
     return () => {
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
-      }
+      Webcam.reset();
     };
-  }, [stream]);
+  }, []);
 
-  const handleBackButtonClick = () => {
-    router.push('/dashboard');
+  const takeSnapshot = () => {
+    Webcam.snap(function(dataUri) {
+      console.log('takeSnapshot', dataUri);
+      // You can use the dataUri for further processing, like uploading the image
+    });
   };
 
   return (
-    <main className="flex items-center justify-center bg-gray-200">
-      <div className="text-black w-[500px] min-h-screen bg-white flex items-center justify-center">
-        <div className="w-full p-6">
-          <div>
-            {isCameraError ? (
-              <p className="text-red-500">Error accessing the camera. Please check your permissions.</p>
-            ) : (
-              <Webcam
-                audio={false}
-                mirrored={true}
-                style={{ width: '100%' }}
-              />
-            )}
-            <button
-              onClick={handleBackButtonClick}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Kembali
-            </button>
-          </div>
+    <div>
+      {isCameraError ? (
+        <p className="text-red-500">Error accessing the camera. Please check your permissions.</p>
+      ) : (
+        <div>
+          <div ref={videoRef}></div>
+          <button onClick={takeSnapshot}>Take Snapshot</button>
         </div>
-      </div>
-    </main>
+      )}
+    </div>
   );
 };
 
-export default CameraPage;
+export default CameraComponent;
