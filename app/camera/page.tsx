@@ -1,5 +1,4 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import Webcam from 'react-webcam';
@@ -7,18 +6,25 @@ import Webcam from 'react-webcam';
 const CameraPage = () => {
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isCameraError, setIsCameraError] = useState(false);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     const startCamera = async () => {
       try {
+        const cameras = await navigator.mediaDevices.enumerateDevices();
+        const backCamera = cameras.find((device) => device.kind === 'videoinput');
+
         const cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' }
+          video: {
+            deviceId: backCamera?.deviceId || undefined,
+            facingMode,
+          },
         });
-    
+
         setStream(cameraStream);
-    
+
         if (videoRef.current) {
           videoRef.current.srcObject = cameraStream;
         }
@@ -26,7 +32,7 @@ const CameraPage = () => {
         console.error('Error accessing camera:', error);
         setIsCameraError(true);
       }
-    };    
+    };
 
     startCamera();
 
@@ -36,10 +42,14 @@ const CameraPage = () => {
         tracks.forEach((track) => track.stop());
       }
     };
-  }, [stream]);
+  }, [facingMode]);
 
   const handleBackButtonClick = () => {
     router.push('/dashboard');
+  };
+
+  const handleCameraSwitch = () => {
+    setFacingMode(facingMode === 'environment' ? 'user' : 'environment');
   };
 
   return (
@@ -52,16 +62,25 @@ const CameraPage = () => {
             ) : (
               <Webcam
                 audio={false}
-                mirrored={true}
+                mirrored={facingMode === 'user'}
                 style={{ width: '100%' }}
+                ref={videoRef}
               />
             )}
-            <button
-              onClick={handleBackButtonClick}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-            >
-              Kembali
-            </button>
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={handleBackButtonClick}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Kembali
+              </button>
+              <button
+                onClick={handleCameraSwitch}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Switch Camera
+              </button>
+            </div>
           </div>
         </div>
       </div>
