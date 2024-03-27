@@ -13,11 +13,28 @@ const CameraPage = () => {
   useEffect(() => {
     const startCamera = async () => {
        try {
-         const cameraStream = await navigator.mediaDevices.getUserMedia({
-           video: {
-             facingMode: { exact: 'environment' },
-           },
+         // Request permission for video devices
+         const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+         const devices = await navigator.mediaDevices.enumerateDevices();
+         let backCameraId;
+   
+         // Find the device ID of the back camera
+         devices.forEach(device => {
+           if (device.kind === 'videoinput' && device.label.toLowerCase().includes('back')) {
+             backCameraId = device.deviceId;
+           }
          });
+   
+         // Stop the temporary stream
+         tempStream.getTracks().forEach(track => track.stop());
+   
+         // Use the device ID to request the back camera stream
+         const constraints = {
+           video: {
+             deviceId: { exact: backCameraId }
+           }
+         };
+         const cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
    
          setStream(cameraStream);
    
@@ -35,10 +52,10 @@ const CameraPage = () => {
     return () => {
        if (stream) {
          const tracks = stream.getTracks();
-         tracks.forEach((track) => track.stop());
+         tracks.forEach(track => track.stop());
        }
     };
-   }, [stream]);
+   }, []);
 
   const handleBackButtonClick = () => {
     router.push('/dashboard');
