@@ -1,13 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faCamera, faListUl } from '@fortawesome/free-solid-svg-icons';
-import Webcam from 'webcamjs';
 import jsQR from 'jsqr';
 import { db } from '../config/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 
 const Menu = () => {
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [isCameraError, setIsCameraError] = useState(false);
@@ -35,28 +34,44 @@ const Menu = () => {
     };
   }, []);
 
-  const handleCameraClick = (e: { preventDefault: () => void; }) => {
+  const handleCameraClick = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
     setIsCameraOpen(true);
 
-    Webcam.set({
-      width: cameraDimensions.width,
-      height: cameraDimensions.height,
-      image_format: 'jpeg',
-      jpeg_quality: 90,
-      force_flash: false,
-      flip_horiz: true,
-      fps: 60,
-    });
-
-    Webcam.attach(videoRef.current, (err: any) => {
-      if (err) {
-        console.error('Error attaching webcam:', err);
-        setIsCameraError(true);
-      } else {
-        console.log('Webcam attached successfully');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: cameraDimensions.width,
+          height: cameraDimensions.height,
+          facingMode: 'environment', // Try using 'user' or removing facingMode
+        },
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
-    });
+    } catch (err: unknown) {
+      console.error('Error accessing the camera:', err);
+
+      // Type assertion to handle 'err' as an instance of 'Error'
+      if (err instanceof Error) {
+        // Now you can safely access the error properties
+        console.error('Error name:', err.name);
+        console.error('Error message:', err.message);
+
+        // Specific error handling
+        if (err.name === 'NotReadableError') {
+          alert('Camera is being used by another application or browser tab.');
+        } else if (err.name === 'NotAllowedError') {
+          alert('Please grant camera permission.');
+        } else {
+          alert('Failed to access the camera. Please check your device settings.');
+        }
+      } else {
+        // If the error is not an instance of 'Error', handle it here
+        alert('An unknown error occurred.');
+      }
+      setIsCameraError(true);
+    }
   };
 
   const handleGasInput = async () => {
@@ -90,31 +105,33 @@ const Menu = () => {
   useEffect(() => {
     const scanQRCode = () => {
       const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-      const videoElement = videoRef.current.querySelector('video');
+      if (canvas) {
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        const videoElement = videoRef.current;
 
-      if (videoElement && context) {
-        canvas.width = cameraDimensions.width;
-        canvas.height = cameraDimensions.height;
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        if (videoElement && context) {
+          canvas.width = cameraDimensions.width;
+          canvas.height = cameraDimensions.height;
+          context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
 
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(imageData.data, imageData.width, imageData.height);
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-        const getRandomVehicleType = () => {
-          const vehicleTypes = ['Dump Truck', 'Light Vehicle'];
-          return vehicleTypes[Math.floor(Math.random() * vehicleTypes.length)];
-        };
+          const getRandomVehicleType = () => {
+            const vehicleTypes = ['Dump Truck', 'Light Vehicle'];
+            return vehicleTypes[Math.floor(Math.random() * vehicleTypes.length)];
+          };
 
-        if (code) {
-          const storedUsername = localStorage.getItem('username');
-          setVehicleHandler('John Doe');
-          setVehicleId(code.data);
-          setVehicleType(getRandomVehicleType());
-          setRefueler(storedUsername || 'Anonymous');
-          setIsGasInputVisible(true);
-        } else {
-          console.log('No QR code detected');
+          if (code) {
+            const storedUsername = localStorage.getItem('username');
+            setVehicleHandler('John Doe');
+            setVehicleId(code.data);
+            setVehicleType(getRandomVehicleType());
+            setRefueler(storedUsername || 'Anonymous');
+            setIsGasInputVisible(true);
+          } else {
+            console.log('No QR code detected');
+          }
         }
       }
     };
@@ -139,7 +156,8 @@ const Menu = () => {
             className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
             onClick={() => {
               setIsCameraOpen(false);
-              Webcam.reset();
+              const stream = videoRef.current?.srcObject as MediaStream;
+              stream?.getTracks().forEach((track) => track.stop());
             }}
           >
             Close
@@ -152,7 +170,7 @@ const Menu = () => {
           </p>
         ) : (
           <div className="mb-32">
-            <div ref={videoRef} className="w-full h-full bg-black"></div>
+            <video ref={videoRef} className="w-full h-full bg-black" autoPlay playsInline />
             <canvas ref={canvasRef} className="hidden"></canvas>
             {isGasInputVisible && (
               <div>
