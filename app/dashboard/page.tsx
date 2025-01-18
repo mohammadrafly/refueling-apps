@@ -6,8 +6,9 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Menu from '../components/Menu';
 import LastRefuel from '../components/LastRefuel';
+import { PitStopProvider } from '../context/PitStopContext';
 
-const Page = () => {
+const Page: React.FC = () => {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -52,29 +53,31 @@ const Page = () => {
   };
 
   return (
-    <main className="flex items-center justify-center bg-gray-200">
-      <div className="text-black w-[500px] min-h-screen bg-white items-center justify-center p-4">
-        {!showLogoutAlert && 
-          <>
-            <Header username={username} />
-          </>
-        }
-          <LastRefuel />
-          <div>
-            {showLogoutAlert && (
-              <div className="bg-green-200 text-green-800 p-2 mb-4 rounded-lg">
-                You have been successfully logged out! Redirecting in {countdown} seconds.
-              </div>
-            )}
-          </div>
-            {!showLogoutAlert && 
-              <>
-                <Footer onLogout={handleLogout} />
-                <Menu />
-              </>
-            }
-      </div>
-    </main>
+    <PitStopProvider>
+      <main className="flex items-center justify-center bg-gray-200">
+        <div className="text-black w-[500px] min-h-screen bg-white items-center justify-center p-4">
+          {!showLogoutAlert &&
+            <>
+              <Header username={username} />
+            </>
+          }
+            <LastRefuel />
+            <div>
+              {showLogoutAlert && (
+                <div className="bg-green-200 text-green-800 p-2 mb-4 rounded-lg">
+                  You have been successfully logged out! Redirecting in {countdown} seconds.
+                </div>
+              )}
+            </div>
+              {!showLogoutAlert &&
+                <>
+                  <Footer onLogout={handleLogout} />
+                  <Menu />
+                </>
+              }
+        </div>
+      </main>
+    </PitStopProvider>
   );
 };
 
